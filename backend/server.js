@@ -2,6 +2,7 @@ const express = require("express");
 const multer = require("multer");
 const cors = require("cors");
 const path = require("path");
+const fs = require("fs");
 
 const app = express();
 const PORT = 5000;
@@ -22,6 +23,41 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage });
+app.use(express.json());
+
+
+app.get("/getTemp1Data", (req, res) => {
+  const jsonFilePath = path.join(__dirname, "data", "temp1Data.json");
+
+  // Read the JSON file asynchronously
+  fs.readFile(jsonFilePath, "utf8", (err, data) => {
+    if (err) {
+      return res.status(500).send("Error reading the JSON file");
+    }
+
+    try {
+      const parsedData = JSON.parse(data); // Parse the file content
+      res.json(parsedData); // Send the parsed JSON as the response
+    } catch (err) {
+      res.status(500).send("Error parsing the JSON file");
+    }
+  });
+});
+
+app.post("/updateTemp1", (req, res) => {
+  const updatedData = req.body;
+  console.log("it was calleddd");
+  // Path to your JSON file
+  const jsonFilePath = path.join(__dirname, "data/temp1Data.json");
+
+  // Write the updated data to the JSON file
+  fs.writeFile(jsonFilePath, JSON.stringify(updatedData, null, 2), (err) => {
+    if (err) {
+      return res.status(500).send("Error writing to JSON file");
+    }
+    res.send("JSON file updated successfully");
+  });
+});
 
 // File upload endpoint
 app.post("/upload", upload.single("image"), (req, res) => {
@@ -35,4 +71,6 @@ app.post("/upload", upload.single("image"), (req, res) => {
   });
 });
 
-app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+app.listen(PORT, () =>
+  console.log(`Server running on http://localhost:${PORT}`)
+);
