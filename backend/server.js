@@ -15,7 +15,7 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 // Configure multer for file uploads
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "uploads/"); // Save to 'uploads' folder
+    cb(null, "../frontend/public/uploads"); // Save to 'uploads' folder
   },
   filename: (req, file, cb) => {
     cb(null, file.originalname);
@@ -46,7 +46,6 @@ app.get("/getTemp1Data", (req, res) => {
 
 app.post("/updateTemp1", (req, res) => {
   const updatedData = req.body;
-  console.log("it was calleddd");
   // Path to your JSON file
   const jsonFilePath = path.join(__dirname, "data/temp1Data.json");
 

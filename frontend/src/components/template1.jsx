@@ -15,7 +15,6 @@ let temp1Data = {
 
 export default function Template1() {
   const [formData, setFormData] = useState(temp1Data);
-  const [heroBackground, setHeroBackground] = useState(null);
   const [uploadedFile, setUploadedFile] = useState(null);
   const navigate = useNavigate();
 
@@ -30,21 +29,45 @@ export default function Template1() {
       }
     };
     loadData();
-  }, []); // Empty dependency array ensures this runs once when the component mounts
+  }, []); // this runs only once when the component mounts
 
-  const onDrop = (acceptedFiles) => {
+  const onDrop = async (acceptedFiles) => {
     const file = acceptedFiles[0];
     setUploadedFile(file);
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      setHeroBackground(e.target.result);
-      setFormData((prevState) => ({
-        ...prevState, // Spread the previous state
-        heroImage: file.name, // Store only the file name in heroImage
-      }));
-      console.log(formData);
-    };
-    reader.readAsDataURL(file);
+
+    // Create FormData for image upload
+    const imageFormData = new FormData();
+    imageFormData.append("image", file);
+
+    try {
+      // Upload the image first
+      const uploadResponse = await axios.post(
+        "http://localhost:5000/upload",
+        imageFormData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      // Update formData with new image name
+      const updatedFormData = {
+        ...formData,
+        heroImage: file.name,
+      };
+
+      // Update the JSON data
+      await axios.post("http://localhost:5000/updateTemp1", updatedFormData);
+
+      // Update local state after both operations are successful
+      setFormData(updatedFormData);
+
+      console.log("Image uploaded and JSON updated successfully");
+    } catch (error) {
+      console.error("Error during upload:", error);
+      alert("Failed to upload image: " + error.message);
+    }
   };
 
   const { getRootProps, getInputProps } = useDropzone({
@@ -70,18 +93,8 @@ export default function Template1() {
   };
 
   const handleSubmit = async (event) => {
-    event.preventDefault();
-
-    // Update the JSON file with form data
-    try {
-      const response = await axios.post(
-        "http://localhost:5000/updateTemp1",
-        formData
-      );
-      alert("JSON updated successfully");
-    } catch (error) {
-      alert("Failed to update JSON: " + error.message);
-    }
+    if (event) event.preventDefault();
+    console.log(formData);
 
     // Handle file upload (optional)
     if (uploadedFile) {
@@ -102,7 +115,17 @@ export default function Template1() {
         alert("Failed to upload image: " + error.message);
       }
     } else {
-      alert("No image uploaded!");
+      alert("No image updated!");
+    }
+    // Update the JSON file with form data
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/updateTemp1",
+        formData
+      );
+      alert("JSON updated successfully");
+    } catch (error) {
+      alert("Failed to update JSON: " + error.message);
     }
   };
 
@@ -112,28 +135,31 @@ export default function Template1() {
       onSubmit={handleSubmit}
     >
       {/* Nav */}
-      <div className="w-full">
+      <div className="w-full relative">
         <textarea
           type="text"
           name="name"
           placeholder="Company name"
           value={formData.name}
           onChange={handleChange}
-          className="p-2 w-full text-2xl bg-black text-center text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="p-3 w-full text-2xl bg-black text-center text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
-        <a
+        <button
           onClick={() => {
             navigate("/service1");
           }}
-        ></a>
+          className="text-white text-xl absolute right-3 hover:bg-gray-800 p-4"
+        >
+          Services
+        </button>
       </div>
 
       {/* Hero Section */}
       <div
         className="flex flex-col w-full h-auto min-h-[29rem] justify-center items-center p-8 relative bg-gray-800"
         style={{
-          background: heroBackground
-            ? `url(${heroBackground}) center/cover no-repeat`
+          background: formData.heroImage
+            ? `url(${`/uploads/${formData.heroImage}`}) center/cover no-repeat`
             : "",
         }}
       >
