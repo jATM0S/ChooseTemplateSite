@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useDropzone } from "react-dropzone";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 // Initial temp1Data (can be loaded from a file in real-world usage)
@@ -12,17 +13,17 @@ let temp1Data = {
   heroImage: "",
 };
 
-export default function App() {
+export default function Template1() {
   const [formData, setFormData] = useState(temp1Data);
   const [heroBackground, setHeroBackground] = useState(null);
   const [uploadedFile, setUploadedFile] = useState(null);
+  const navigate = useNavigate();
 
   // Load data from a JSON file (or API)
   useEffect(() => {
     const loadData = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/getTemp1Data');
-        console.log(response.data);
+        const response = await axios.get("http://localhost:5000/getTemp1Data");
         setFormData(response.data); // Set the initial form data from JSON file
       } catch (error) {
         console.error("Error loading JSON data:", error);
@@ -37,6 +38,11 @@ export default function App() {
     const reader = new FileReader();
     reader.onload = (e) => {
       setHeroBackground(e.target.result);
+      setFormData((prevState) => ({
+        ...prevState, // Spread the previous state
+        heroImage: file.name, // Store only the file name in heroImage
+      }));
+      console.log(formData);
     };
     reader.readAsDataURL(file);
   };
@@ -68,7 +74,10 @@ export default function App() {
 
     // Update the JSON file with form data
     try {
-      const response = await axios.post('http://localhost:5000/updateTemp1', formData);
+      const response = await axios.post(
+        "http://localhost:5000/updateTemp1",
+        formData
+      );
       alert("JSON updated successfully");
     } catch (error) {
       alert("Failed to update JSON: " + error.message);
@@ -79,11 +88,15 @@ export default function App() {
       const formData = new FormData();
       formData.append("image", uploadedFile);
       try {
-        const response = await axios.post("http://localhost:5000/upload", formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        });
+        const response = await axios.post(
+          "http://localhost:5000/upload",
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
         alert("Image uploaded successfully: " + response.data.filePath);
       } catch (error) {
         alert("Failed to upload image: " + error.message);
@@ -108,13 +121,20 @@ export default function App() {
           onChange={handleChange}
           className="p-2 w-full text-2xl bg-black text-center text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
+        <a
+          onClick={() => {
+            navigate("/service1");
+          }}
+        ></a>
       </div>
 
       {/* Hero Section */}
       <div
         className="flex flex-col w-full h-auto min-h-[29rem] justify-center items-center p-8 relative bg-gray-800"
         style={{
-          background: heroBackground ? `url(${heroBackground}) center/cover no-repeat` : "",
+          background: heroBackground
+            ? `url(${heroBackground}) center/cover no-repeat`
+            : "",
         }}
       >
         <textarea
