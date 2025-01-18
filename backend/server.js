@@ -26,8 +26,25 @@ const upload = multer({ storage });
 app.use(express.json());
 
 
-app.get("/getTemp1Data", (req, res) => {
+app.get("/getTemp1Data1", (req, res) => {
   const jsonFilePath = path.join(__dirname, "data", "temp1Data.json");
+
+  // Read the JSON file asynchronously
+  fs.readFile(jsonFilePath, "utf8", (err, data) => {
+    if (err) {
+      return res.status(500).send("Error reading the JSON file");
+    }
+
+    try {
+      const parsedData = JSON.parse(data); // Parse the file content
+      res.json(parsedData); // Send the parsed JSON as the response
+    } catch (err) {
+      res.status(500).send("Error parsing the JSON file");
+    }
+  });
+});
+app.get("/getTemp2Data", (req, res) => {
+  const jsonFilePath = path.join(__dirname, "data", "temp2Data.json");
 
   // Read the JSON file asynchronously
   fs.readFile(jsonFilePath, "utf8", (err, data) => {
@@ -48,6 +65,20 @@ app.post("/updateTemp1", (req, res) => {
   const updatedData = req.body;
   // Path to your JSON file
   const jsonFilePath = path.join(__dirname, "data/temp1Data.json");
+
+  // Write the updated data to the JSON file
+  fs.writeFile(jsonFilePath, JSON.stringify(updatedData, null, 2), (err) => {
+    if (err) {
+      return res.status(500).send("Error writing to JSON file");
+    }
+    res.send("JSON file updated successfully");
+  });
+});
+
+app.post("/updateTemp2", (req, res) => {
+  const updatedData = req.body;
+  // Path to your JSON file
+  const jsonFilePath = path.join(__dirname, "data/temp2Data.json");
 
   // Write the updated data to the JSON file
   fs.writeFile(jsonFilePath, JSON.stringify(updatedData, null, 2), (err) => {

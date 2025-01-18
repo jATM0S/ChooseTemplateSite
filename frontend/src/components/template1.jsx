@@ -3,26 +3,25 @@ import { useDropzone } from "react-dropzone";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
-// Initial temp1Data (can be loaded from a file in real-world usage)
-let temp1Data = {
+const initialFormData = {
   name: "",
   heroMessage: "",
   aboutUs: "",
   description: "",
   footerMessage: "",
   heroImage: "",
+  cards:""
 };
 
 export default function Template1() {
-  const [formData, setFormData] = useState(temp1Data);
+  const [formData, setFormData] = useState(initialFormData);
   const [uploadedFile, setUploadedFile] = useState(null);
   const navigate = useNavigate();
 
-  // Load data from a JSON file (or API)
   useEffect(() => {
     const loadData = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/getTemp1Data");
+        const response = await axios.get("http://localhost:5000/getTemp1Data1");
         setFormData(response.data); // Set the initial form data from JSON file
       } catch (error) {
         console.error("Error loading JSON data:", error);
@@ -33,6 +32,8 @@ export default function Template1() {
 
   const onDrop = async (acceptedFiles) => {
     const file = acceptedFiles[0];
+    if (!file) return;
+
     setUploadedFile(file);
 
     // Create FormData for image upload
@@ -70,19 +71,23 @@ export default function Template1() {
     }
   };
 
-  const { getRootProps, getInputProps } = useDropzone({
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
-    accept: "image/*",
+    accept: {
+      'image/*': ['.jpeg', '.jpg', '.png', '.gif', '.webp']
+    },
+    maxFiles: 1,
+    multiple: false
   });
 
   const autoResize = (element) => {
     element.style.height = "auto";
-    element.style.height = element.scrollHeight + "px";
+    element.style.height = `${element.scrollHeight}px`;
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
+    setFormData(prev => ({
       ...prev,
       [name]: value,
     }));
@@ -94,38 +99,24 @@ export default function Template1() {
 
   const handleSubmit = async (event) => {
     if (event) event.preventDefault();
-    console.log(formData);
 
-    // Handle file upload (optional)
-    if (uploadedFile) {
-      const formData = new FormData();
-      formData.append("image", uploadedFile);
-      try {
-        const response = await axios.post(
-          "http://localhost:5000/upload",
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
-        alert("Image uploaded successfully: " + response.data.filePath);
-      } catch (error) {
-        alert("Failed to upload image: " + error.message);
-      }
-    } else {
-      alert("No image updated!");
-    }
-    // Update the JSON file with form data
     try {
-      const response = await axios.post(
-        "http://localhost:5000/updateTemp1",
-        formData
-      );
-      alert("JSON updated successfully");
+      if (uploadedFile) {
+        const imageFormData = new FormData();
+        imageFormData.append("image", uploadedFile);
+        
+        await axios.post("http://localhost:5000/upload", imageFormData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+      }
+
+      await axios.post("http://localhost:5000/updateTemp1", formData);
+      alert("Changes saved successfully!");
     } catch (error) {
-      alert("Failed to update JSON: " + error.message);
+      console.error("Error saving changes:", error);
+      alert("Failed to save changes: " + error.message);
     }
   };
 
@@ -134,10 +125,8 @@ export default function Template1() {
       className="flex flex-col items-center space-y-4 w-full bg-gray-900"
       onSubmit={handleSubmit}
     >
-      {/* Nav */}
       <div className="w-full relative">
         <textarea
-          type="text"
           name="name"
           placeholder="Company name"
           value={formData.name}
@@ -145,9 +134,15 @@ export default function Template1() {
           className="p-3 w-full text-2xl bg-black text-center text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
         <button
-          onClick={() => {
-            navigate("/service1");
-          }}
+          type="button"
+          onClick={() => navigate("/temp1")}
+          className="text-white text-xl absolute right-28 hover:bg-gray-800 p-4"
+        >
+          Home
+        </button>
+        <button
+          type="button"
+          onClick={() => navigate("/service1")}
           className="text-white text-xl absolute right-3 hover:bg-gray-800 p-4"
         >
           Services
@@ -171,13 +166,14 @@ export default function Template1() {
           onChange={handleChange}
         />
 
-        {/* Dropzone */}
         <div
           {...getRootProps()}
-          className="absolute bottom-4 right-4 p-4 bg-blue-500 text-white rounded-md cursor-pointer hover:bg-blue-600"
+          className={`absolute bottom-4 right-4 p-4 ${
+            isDragActive ? 'bg-blue-600' : 'bg-blue-500'
+          } text-white rounded-md cursor-pointer hover:bg-blue-600 transition-colors`}
         >
           <input {...getInputProps()} />
-          <p>Upload Image</p>
+          <p>{isDragActive ? 'Drop the image here' : 'Upload Image'}</p>
         </div>
       </div>
 
@@ -195,7 +191,7 @@ export default function Template1() {
           placeholder="Company's description here..."
           value={formData.description}
           onChange={handleChange}
-          className="p-3 text-center text-white rounded-lg bg-inherit h-auto w-full md:w-4/5 resize-none focus:outline-slate-400 "
+          className="p-3 text-center text-white rounded-lg bg-inherit h-auto w-full md:w-4/5 resize-none focus:outline-slate-400"
         />
       </div>
 
@@ -211,7 +207,7 @@ export default function Template1() {
       <div className="w-full flex justify-center bg-white">
         <button
           type="submit"
-          className="bg-blue-600 text-white py-2 px-6 my-4 rounded-md hover:bg-blue-700 w-1/4"
+          className="bg-blue-600 text-white py-2 px-6 my-4 rounded-md hover:bg-blue-700 w-1/4 transition-colors"
         >
           Save Layout
         </button>
