@@ -1,8 +1,42 @@
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
-
+import { useState, useEffect } from "react";
 import Nav from "./nav";
+
+function Selected() {
+  return (
+    <div className="bg-green-500 text-gray-100 py-2 px-4 rounded-md">Selected</div>
+  );
+}
+
 export default function Templates() {
   const navigate = useNavigate();
+  const [choosenTemplate, setChoosenTemplate] = useState(0);
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/getChoosen");
+        setChoosenTemplate(response.data.choosenTemplate); // Set the initial form data from JSON file
+        console.log(response.data);
+      } catch (error) {
+        console.error("Error loading JSON data:", error);
+      }
+      console.log(choosenTemplate);
+    };
+
+    loadData();
+  },[]);
+  const changeSelectedTemplate = async (templateId) => {
+    try {
+      setChoosenTemplate(templateId);
+      await axios.post("http://localhost:5000/choose",  { choosenTemplate: templateId });
+      alert("Changes saved successfully!");
+    } catch {
+      console.error("Error saving changes:", error);
+      alert("Failed to save changes: " + error.message);
+    }
+  };
   return (
     <div>
       <Nav />
@@ -22,12 +56,21 @@ export default function Templates() {
             </div>
             <div className="p-4">
               <p className="text-gray-700 mb-4">something something</p>
-              <button
-                className="bg-purple-600 text-white py-2 px-4 rounded-md hover:bg-purple-700"
-                onClick={() => navigate("/temp1")}
-              >
-                Choose
-              </button>
+              <div className="flex gap-5">
+                <button
+                  className="bg-purple-600 text-white py-2 px-4 rounded-md hover:bg-purple-700"
+                  onClick={() => changeSelectedTemplate(1)}
+                >
+                  Choose
+                </button>
+                <button
+                  className="bg-gray-400 text-gray-900 py-2 px-4 rounded-md hover:bg-purple-700"
+                  onClick={() => navigate("/temp1")}
+                >
+                  Edit
+                </button>
+                {choosenTemplate == 1 ? <Selected /> : <></>}
+              </div>
             </div>
           </div>
           <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 p-4 overflow-hidden">
@@ -40,12 +83,21 @@ export default function Templates() {
             </div>
             <div className="p-4">
               <p className="text-gray-700 mb-4">something something</p>
-              <button
-                className="bg-purple-600 text-white py-2 px-4 rounded-md hover:bg-purple-700"
-                onClick={() => navigate("/temp2")}
-              >
-                Choose
-              </button>
+              <div className="flex gap-5">
+                <button
+                  className="bg-purple-600 text-white py-2 px-4 rounded-md hover:bg-purple-700"
+                  onClick={() => changeSelectedTemplate(2)}
+                >
+                  Choose
+                </button>
+                <button
+                  className="bg-gray-400 text-gray-900 py-2 px-4 rounded-md hover:bg-purple-700"
+                  onClick={() => navigate("/temp2")}
+                >
+                  Edit
+                </button>
+                {choosenTemplate == 2 ? <Selected /> : <></>}
+              </div>
             </div>
           </div>
         </div>

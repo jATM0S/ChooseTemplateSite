@@ -6,12 +6,15 @@ import Service1 from "./components/service1.jsx";
 import Service2 from "./components/service2.jsx";
 import Site1 from "./components/site1.jsx";
 import Site2 from "./components/site2.jsx";
+import Home from "./components/home.jsx";
 export default function App() {
+ 
+
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/templates" element={<Templates />} />
-        {/* <Route path="home" element={<Home/>} /> */}
+        <Route path="home" element={<Home/>} />
         <Route path="/temp1" element={<Template1 />} />
         <Route path="/temp2" element={<Template2 />} />
         <Route path="/service1" element={<Service1 />} />
