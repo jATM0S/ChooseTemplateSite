@@ -131,7 +131,7 @@ export default function Template1() {
           placeholder="Company name"
           value={formData.name}
           onChange={handleChange}
-          className="p-3 w-full text-2xl bg-black text-center text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="p-3 w-full text-2xl bg-black sm:text-center text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
         <button
           type="button"
