@@ -8,7 +8,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Templates />} />
+        <Route path="/templates" element={<Templates />} />
         {/* <Route path="home" element={<Home/>} /> */}
         <Route path="/temp1" element={<Template1 />} />
         <Route path="/temp2" element={<Template2 />} />

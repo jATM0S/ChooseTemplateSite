@@ -25,26 +25,8 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 app.use(express.json());
 
-
-app.get("/getTemp1Data1", (req, res) => {
+app.get("/getTemp1Data", (req, res) => {
   const jsonFilePath = path.join(__dirname, "data", "temp1Data.json");
-
-  // Read the JSON file asynchronously
-  fs.readFile(jsonFilePath, "utf8", (err, data) => {
-    if (err) {
-      return res.status(500).send("Error reading the JSON file");
-    }
-
-    try {
-      const parsedData = JSON.parse(data); // Parse the file content
-      res.json(parsedData); // Send the parsed JSON as the response
-    } catch (err) {
-      res.status(500).send("Error parsing the JSON file");
-    }
-  });
-});
-app.get("/getTemp2Data", (req, res) => {
-  const jsonFilePath = path.join(__dirname, "data", "temp2Data.json");
 
   // Read the JSON file asynchronously
   fs.readFile(jsonFilePath, "utf8", (err, data) => {
@@ -72,6 +54,24 @@ app.post("/updateTemp1", (req, res) => {
       return res.status(500).send("Error writing to JSON file");
     }
     res.send("JSON file updated successfully");
+  });
+});
+
+app.get("/getTemp2Data", (req, res) => {
+  const jsonFilePath = path.join(__dirname, "data", "temp2Data.json");
+
+  // Read the JSON file asynchronously
+  fs.readFile(jsonFilePath, "utf8", (err, data) => {
+    if (err) {
+      return res.status(500).send("Error reading the JSON file");
+    }
+
+    try {
+      const parsedData = JSON.parse(data); // Parse the file content
+      res.json(parsedData); // Send the parsed JSON as the response
+    } catch (err) {
+      res.status(500).send("Error parsing the JSON file");
+    }
   });
 });
 

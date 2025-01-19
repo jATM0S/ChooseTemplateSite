@@ -10,7 +10,7 @@ const initialFormData = {
   description: "",
   footerMessage: "",
   heroImage: "",
-  cards:""
+  cards: "",
 };
 
 export default function Template1() {
@@ -21,7 +21,7 @@ export default function Template1() {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/getTemp1Data1");
+        const response = await axios.get("http://localhost:5000/getTemp1Data");
         setFormData(response.data); // Set the initial form data from JSON file
       } catch (error) {
         console.error("Error loading JSON data:", error);
@@ -74,10 +74,10 @@ export default function Template1() {
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: {
-      'image/*': ['.jpeg', '.jpg', '.png', '.gif', '.webp']
+      "image/*": [".jpeg", ".jpg", ".png", ".gif", ".webp"],
     },
     maxFiles: 1,
-    multiple: false
+    multiple: false,
   });
 
   const autoResize = (element) => {
@@ -87,7 +87,7 @@ export default function Template1() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
@@ -104,7 +104,7 @@ export default function Template1() {
       if (uploadedFile) {
         const imageFormData = new FormData();
         imageFormData.append("image", uploadedFile);
-        
+
         await axios.post("http://localhost:5000/upload", imageFormData, {
           headers: {
             "Content-Type": "multipart/form-data",
@@ -169,11 +169,11 @@ export default function Template1() {
         <div
           {...getRootProps()}
           className={`absolute bottom-4 right-4 p-4 ${
-            isDragActive ? 'bg-blue-600' : 'bg-blue-500'
+            isDragActive ? "bg-blue-600" : "bg-blue-500"
           } text-white rounded-md cursor-pointer hover:bg-blue-600 transition-colors`}
         >
           <input {...getInputProps()} />
-          <p>{isDragActive ? 'Drop the image here' : 'Upload Image'}</p>
+          <p>{isDragActive ? "Drop the image here" : "Upload Image"}</p>
         </div>
       </div>
 
@@ -204,12 +204,18 @@ export default function Template1() {
         className="text-white text-center p-8 my-8 w-full bg-inherit resize-none overflow-hidden"
       />
 
-      <div className="w-full flex justify-center bg-white">
+      <div className="w-full flex justify-center gap-5 bg-white">
         <button
           type="submit"
           className="bg-blue-600 text-white py-2 px-6 my-4 rounded-md hover:bg-blue-700 w-1/4 transition-colors"
         >
           Save Layout
+        </button>
+        <button
+          className="bg-blue-600 text-white py-2 px-6 my-4 rounded-md hover:bg-blue-700 w-1/4 transition-colors"
+          onClick={() => navigate("/templates")}
+        >
+          Back to templates
         </button>
       </div>
     </form>
