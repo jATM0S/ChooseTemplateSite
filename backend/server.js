@@ -51,7 +51,6 @@ app.post("/choose", (req, res) => {
   const updatedData = {
     choosenTemplate: choosenTemplate,
   };
-  console.log(updatedData);
   // Write the updated data to the JSON file
   fs.writeFile(jsonFilePath, JSON.stringify(updatedData, null, 2), (err) => {
     if (err) {
